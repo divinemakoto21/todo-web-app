@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A modern, responsive Todo List web application built for a university project, designed for future Python FastAPI and SQLite integration.">
+  <title>TaskFlow Pro | University Project Task Manager</title>
+  
+  <!-- Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Background Glow Accents for Modern Visual Depth -->
+  <div class="bg-glow bg-glow-1" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow-2" aria-hidden="true"></div>
+
+  <div class="app-wrapper">
+    <!-- Top Navigation & Brand Header -->
+    <header class="app-header">
+      <div class="header-container">
+        <div class="brand-section">
+          <div class="brand-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 11 3 3L22 4"></path>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1 class="brand-title">TaskFlow <span class="badge-pro">Pro</span></h1>
+            <p class="brand-subtitle">University Engineering Project • Academic Task System</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <!-- Backend Architecture Indicator -->
+          <div class="backend-status-pill" id="backendStatusPill" title="Click to view REST API contract details">
+            <span class="status-dot disconnected"></span>
+            <span class="status-label">Backend: <strong id="backendStatusText">In-Memory Mode</strong></span>
+            <button type="button" class="btn-api-info" id="openApiModalBtn" aria-label="View FastAPI Architecture">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 16v-4"></path>
+                <path d="M12 8h.01"></path>
+              </svg>
+              <span>API Specs</span>
+            </button>
+          </div>
+
+          <!-- Current Live Date -->
+          <div class="current-date-badge" id="currentDateBadge" aria-label="Current Date">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+              <line x1="16" x2="16" y1="2" y2="6"></line>
+              <line x1="8" x2="8" y1="2" y2="6"></line>
+              <line x1="3" x2="21" y1="10" y2="10"></line>
+            </svg>
+            <span id="headerDateText">Today</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <main class="dashboard-container">
+      
+      <!-- Metrics & Overview Section (Feature 8: Total & Completed Tasks) -->
+      <section class="metrics-grid" aria-label="Task Analytics Overview">
+        <div class="metric-card card-total">
+          <div class="metric-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Total Tasks</span>
+            <span class="metric-value" id="statTotalCount">0</span>
+          </div>
+        </div>
+
+        <div class="metric-card card-pending">
+          <div class="metric-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Pending</span>
+            <span class="metric-value" id="statPendingCount">0</span>
+          </div>
+        </div>
+
+        <div class="metric-card card-completed">
+          <div class="metric-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Completed</span>
+            <span class="metric-value" id="statCompletedCount">0</span>
+          </div>
+        </div>
+
+        <div class="metric-card card-progress">
+          <div class="metric-progress-header">
+            <span class="metric-label">Completion Rate</span>
+            <span class="progress-percentage" id="statCompletionRate">0%</span>
+          </div>
+          <div class="progress-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="statProgressBarTrack">
+            <div class="progress-bar-fill" id="statProgressBar"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Two-Column Layout (Form + Task Hub) -->
+      <div class="content-layout">
+        
+        <!-- Left Column: Add Task Form (Feature 1, 5, 6) -->
+        <aside class="sidebar-panel">
+          <div class="panel-card form-card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon-badge" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="card-title">Create Task</h2>
+                  <p class="card-desc">Add a new academic or project milestone</p>
+                </div>
+              </div>
+            </div>
+
+            <form id="taskForm" class="task-form" novalidate>
+              <!-- Task Title -->
+              <div class="form-group">
+                <label for="taskTitle" class="form-label">
+                  Task Title <span class="required-star">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <input 
+                    type="text" 
+                    id="taskTitle" 
+                    class="form-control" 
+                    placeholder="e.g. Implement FastAPI CRUD Endpoints" 
+                    maxlength="120" 
+                    required 
+                    autocomplete="off"
+                  >
+                </div>
+                <span class="form-error" id="titleError">Please enter a task title.</span>
+              </div>
+
+              <!-- Task Description -->
+              <div class="form-group">
+                <label for="taskDescription" class="form-label">
+                  Description <span class="optional-tag">(Optional)</span>
+                </label>
+                <textarea 
+                  id="taskDescription" 
+                  class="form-control textarea-control" 
+                  rows="3" 
+                  placeholder="Outline key requirements, acceptance criteria, or relevant links..."
+                  maxlength="500"
+                ></textarea>
+                <div class="character-count" id="descCharCount">0/500</div>
+              </div>
+
+              <!-- Task Priority (Feature 5: Low, Medium, High) -->
+              <div class="form-group">
+                <label class="form-label">Priority Level <span class="required-star">*</span></label>
+                <div class="priority-selector" role="radiogroup" aria-label="Task Priority">
+                  <label class="priority-option option-low">
+                    <input type="radio" name="priority" value="low" id="priorityLow">
+                    <span class="priority-box">
+                      <span class="priority-indicator"></span>
+                      <span class="priority-text">Low</span>
+                    </span>
+                  </label>
+                  
+                  <label class="priority-option option-medium">
+                    <input type="radio" name="priority" value="medium" id="priorityMedium" checked>
+                    <span class="priority-box">
+                      <span class="priority-indicator"></span>
+                      <span class="priority-text">Medium</span>
+                    </span>
+                  </label>
+
+                  <label class="priority-option option-high">
+                    <input type="radio" name="priority" value="high" id="priorityHigh">
+                    <span class="priority-box">
+                      <span class="priority-indicator"></span>
+                      <span class="priority-text">High</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Due Date (Feature 6) -->
+              <div class="form-group">
+                <label for="taskDueDate" class="form-label">
+                  Due Date <span class="optional-tag">(Optional)</span>
+                </label>
+                <div class="input-wrapper date-input-wrapper">
+                  <input 
+                    type="date" 
+                    id="taskDueDate" 
+                    class="form-control date-control"
+                  >
+                </div>
+                <!-- Quick Date Helper Buttons -->
+                <div class="quick-date-buttons">
+                  <button type="button" class="btn-quick-date" data-days="0">Today</button>
+                  <button type="button" class="btn-quick-date" data-days="1">Tomorrow</button>
+                  <button type="button" class="btn-quick-date" data-days="7">+1 Week</button>
+                  <button type="button" class="btn-quick-date btn-clear-date" id="clearDateBtn" title="Clear due date">Clear</button>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" class="btn-submit" id="submitTaskBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Add Task</span>
+              </button>
+            </form>
+          </div>
+        </aside>
+
+        <!-- Right Column: Task List & Filtering Toolbar (Feature 2, 3, 4, 7) -->
+        <section class="tasks-panel" aria-label="Task Management Hub">
+          <div class="panel-card tasks-container-card">
+            
+            <!-- Controls Bar: Filter Tabs, Search & Priority Filter -->
+            <div class="tasks-toolbar">
+              <!-- Filter Tabs (Feature 7: All, Pending, Completed) -->
+              <div class="filter-tabs" role="tablist" aria-label="Filter tasks by status">
+                <button type="button" class="filter-tab active" data-filter="all" id="tabFilterAll" role="tab" aria-selected="true">
+                  <span>All</span>
+                  <span class="tab-count" id="tabCountAll">0</span>
+                </button>
+                <button type="button" class="filter-tab" data-filter="pending" id="tabFilterPending" role="tab" aria-selected="false">
+                  <span>Pending</span>
+                  <span class="tab-count" id="tabCountPending">0</span>
+                </button>
+                <button type="button" class="filter-tab" data-filter="completed" id="tabFilterCompleted" role="tab" aria-selected="false">
+                  <span>Completed</span>
+                  <span class="tab-count" id="tabCountCompleted">0</span>
+                </button>
+              </div>
+
+              <!-- Secondary Filters: Search & Priority Dropdown -->
+              <div class="toolbar-actions">
+                <!-- Search Input -->
+                <div class="search-box">
+                  <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input 
+                    type="search" 
+                    id="searchInput" 
+                    class="search-control" 
+                    placeholder="Search tasks..." 
+                    autocomplete="off"
+                  >
+                  <button type="button" class="btn-search-clear" id="searchClearBtn" aria-label="Clear search" style="display: none;">
+                    &times;
+                  </button>
+                </div>
+
+                <!-- Priority Filter Dropdown -->
+                <div class="select-wrapper">
+                  <select id="priorityFilterSelect" class="select-control" aria-label="Filter by priority">
+                    <option value="all">All Priorities</option>
+                    <option value="high">High Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="low">Low Priority</option>
+                  </select>
+                </div>
+
+                <!-- Sort By Dropdown -->
+                <div class="select-wrapper">
+                  <select id="sortBySelect" class="select-control" aria-label="Sort tasks">
+                    <option value="created_desc">Newest First</option>
+                    <option value="due_asc">Due Date (Earliest)</option>
+                    <option value="priority_desc">Priority (High to Low)</option>
+                    <option value="title_asc">Title (A-Z)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Filter Indicator Banner (when search or filter active) -->
+            <div class="filter-status-bar" id="filterStatusBar" style="display: none;">
+              <span id="filterStatusText">Showing filtered tasks</span>
+              <button type="button" class="btn-reset-filters" id="resetFiltersBtn">Reset Filters</button>
+            </div>
+
+            <!-- Task List Container (Feature 2) -->
+            <div class="task-list-wrapper">
+              <ul class="task-list" id="taskList" aria-live="polite">
+                <!-- Task items will be dynamically injected here by app.js -->
+              </ul>
+
+              <!-- Empty State Template -->
+              <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon-circle">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                  </svg>
+                </div>
+                <h3 class="empty-title" id="emptyStateTitle">No tasks found</h3>
+                <p class="empty-desc" id="emptyStateDesc">Get started by creating a new task using the form on the left.</p>
+              </div>
+            </div>
+
+            <!-- Tasks Footer Info -->
+            <div class="tasks-footer">
+              <span id="taskCountSummary">Displaying 0 tasks</span>
+              <div class="legend-items">
+                <span class="legend-item"><span class="legend-dot priority-high"></span> High</span>
+                <span class="legend-item"><span class="legend-dot priority-medium"></span> Medium</span>
+                <span class="legend-item"><span class="legend-dot priority-low"></span> Low</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Project Footer -->
+    <footer class="app-footer">
+      <div class="footer-container">
+        <p class="footer-text">
+          TaskFlow Pro • University Project Demonstration • Architecture Ready for <strong>Python FastAPI</strong> &amp; <strong>SQLite</strong>
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- REST API Architecture Modal (For Demonstration to Lecturer) -->
+  <div class="modal-backdrop" id="apiModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-badge">Architecture Blueprint</span>
+          <h3 class="modal-title" id="modalTitle">FastAPI &amp; SQLite Integration Contract</h3>
+        </div>
+        <button type="button" class="btn-modal-close" id="closeApiModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro">
+          This frontend is decoupled from data persistence in strict compliance with project guidelines.
+          All actions are dispatched through <code class="code-inline">js/api.js</code>, designed to connect to the following REST endpoints when FastAPI is started:
+        </p>
+
+        <div class="api-endpoints-table">
+          <div class="endpoint-row">
+            <span class="http-method get">GET</span>
+            <code class="endpoint-path">/api/tasks</code>
+            <span class="endpoint-desc">Fetch list of tasks with priority and due date</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="http-method post">POST</span>
+            <code class="endpoint-path">/api/tasks</code>
+            <span class="endpoint-desc">Create a new task with JSON payload</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="http-method put">PUT</span>
+            <code class="endpoint-path">/api/tasks/{id}</code>
+            <span class="endpoint-desc">Update task fields or toggle completion status</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="http-method delete">DELETE</span>
+            <code class="endpoint-path">/api/tasks/{id}</code>
+            <span class="endpoint-desc">Remove task from SQLite database</span>
+          </div>
+          <div class="endpoint-row">
+            <span class="http-method get">GET</span>
+            <code class="endpoint-path">/api/health</code>
+            <span class="endpoint-desc">Backend connection status &amp; database readiness</span>
+          </div>
+        </div>
+
+        <div class="sqlite-schema-preview">
+          <h4>Proposed SQLite Schema:</h4>
+          <pre class="code-block"><code>CREATE TABLE tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title VARCHAR(120) NOT NULL,
+    description TEXT,
+    priority VARCHAR(10) DEFAULT 'medium',
+    due_date DATE,
+    is_completed BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-primary" id="confirmModalCloseBtn">Understood</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-backdrop" id="deleteModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <div class="modal-icon-danger" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="modal-title" id="deleteModalTitle">Delete Task</h3>
+          <p class="modal-subtitle">Are you sure you want to remove this task?</p>
+        </div>
+        <button type="button" class="btn-modal-close" id="closeDeleteModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="delete-task-preview" id="deleteTaskTitlePreview">"Task Title"</p>
+        <p class="delete-warning-text">This action will remove the task from the current session.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn-modal-danger" id="confirmDeleteBtn">Delete Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dynamic Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Application Logic Scripts (Separated Modules: API Service & App Controller) -->
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
